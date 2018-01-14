@@ -1,35 +1,72 @@
 (function(document, $) {
   'use strict';
 
-  var app = (function IIFE () {
-    var ajax = new XMLHttpRequest();
+  var Helpers = {
+    isRequestSuccessful:  function isRequestSuccessful (request) {
+      return request.readyState === 4 && request.status === 200;
+    },
 
-    var Car = function Car (img, modelo, ano, placa, cor) {
-      this.img = img;
-      this.modelo = modelo;
-      this.ano = ano;
-      this.placa = placa;
-      this.cor = cor;
+    isPropImg: function isPropImg (string) {
+      return string === 'img';
+    },
 
-      return this;
+    validateFormEntries: function (obj) {
+      for (let prop in obj) {
+        if (obj[prop] === '') return false
+      }
+
+      return true;
+    }
+  };
+
+  var setupUI = function () {
+    var $title = $('title');
+    var $companyName = $('[data-js="companyName"]');
+    var $companyDescription = $('[data-js="companyDescription"]');
+    var $companyPhone = $('[data-js="companyPhone"]');
+    var $formRegisterCar = $('[data-js="formRegisterCar"]');
+    var $tableRecords = $('[data-js="recordsTable"]');
+    var $imgInput = $('[data-js="imgInput"]');
+    var $modeloInput = $('[data-js="modeloInput"]');
+    var $anoInput = $('[data-js="anoInput"]');
+    var $placaInput = $('[data-js="placaInput"]');
+    var $corInput = $('[data-js="corInput"]');
+
+    var init = function () {
+      initEvents();
     };
 
-    var init = function init () {
-      this.getCompanyInfo();
-      this.initEvents();
+    var initEvents = function () {
+      $formRegisterCar.on('submit', handleSubmitForm, false);
     };
 
-    var getCompanyInfo = function getCompanyInfo () {
-      ajax.open('GET', 'js/company.json');
-      ajax.send();
-      ajax.addEventListener('readystatechange', this.ajaxHandle, false);
+    var handleSubmitForm = function (e) {
+      e.preventDefault();
+
+      var data = {
+        img: $imgInput.get().value,
+        modelo: $modeloInput.get().value,
+        ano: $anoInput.get().value,
+        placa: $placaInput.get().value,
+        cor: $corInput.get().value
+      };
+
+      if(!Helpers.validateFormEntries(data))
+        return;
+
+      clearForm();
+      App.addCar(data);
     };
 
-    var fillCompanyInfo = function fillCompanyInfo (data) {
-      var $title = $('title');
-      var $companyName = $('[data-js="companyName"]');
-      var $companyDescription = $('[data-js="companyDescription"]');
-      var $companyPhone = $('[data-js="companyPhone"]');
+    var clearForm = function () {
+      $imgInput.get().value = '';
+      $modeloInput.get().value = '';
+      $anoInput.get().value = '';
+      $placaInput.get().value = '';
+      $corInput.get().value = '';
+    };
+
+    var fillCompanyInfo = function (data) {
       $title.get().textContent = data.title;
       $companyDescription.get().textContent = data.description;
       $companyPhone.get().textContent = data.phone;
@@ -37,84 +74,83 @@
       $companyName.forEach(function(item) {
         item.textContent = data.name;
       });
-    }
-
-    var initEvents = function initEvents () {
-      $('[data-js="formRegisterCar"]').on('submit', this.handleSubmit, false);
     };
 
-    var handleSubmit = function handleSubmit (event) {
-      event.preventDefault();
-      {
-        let formData = app.getFormData();
-        let car = new Car(formData.img, formData.modelo, formData.ano, formData.placa, formData.cor);
-        app.addCarToRecords(car);
+    var addCarToTable = function (data) {
+      var $docFragment = document.createDocumentFragment();
+      var $newRow = document.createElement('tr');
+
+      for(let prop in data) {
+        var $newColumn = document.createElement('td');
+        if(Helpers.isPropImg(prop)) {
+          {
+            let $tdImg = document.createElement('img');
+            $tdImg.setAttribute('src', data[prop]);
+            $newColumn.appendChild($tdImg);
+          }
+        } else {
+          $newColumn.textContent = data[prop];
+        }
+        $newRow.appendChild($newColumn);
       }
+
+      $docFragment.appendChild($newRow);
+      $tableRecords.get().children[1].appendChild($docFragment);
     };
 
-    var ajaxHandle = function ajaxHandle () {
-      if(!app.isRequestSuccessful(ajax))
+    var publicAPI = {
+      init: init,
+      addCarToTable: addCarToTable,
+      fillCompanyInfo: fillCompanyInfo
+    };
+
+    return publicAPI;
+  };
+
+  var setupApp = function (UI) {
+    var init = function () {
+      getCompanyInfo();
+    };
+
+    var getCompanyInfo = function () {
+      var ajax = new XMLHttpRequest();
+      ajax.open('GET', 'js/company.json');
+      ajax.send();
+      ajax.addEventListener('readystatechange', handleAjaxCompanyInfo, false);
+    };
+
+    var handleAjaxCompanyInfo = function () {
+      if(!Helpers.isRequestSuccessful(this))
         return;
 
       try {
-        app.fillCompanyInfo(JSON.parse(ajax.response));
+        {
+          let data = JSON.parse(this.response);
+          UI.fillCompanyInfo(data);
+        }
       } catch (err) {
         throw new Error('Aconteceu um probleminha:' + err);
       }
     };
 
-    var isRequestSuccessful = function isRequestSuccessful (request) {
-      return request.readyState === 4 && request.status === 200;
-    };
-
-    var getFormData = function getFormData () {
-      return {
-        img: $('[data-js="imgInput"]').get().value,
-        modelo: $('[data-js="modeloInput"]').get().value,
-        ano: $('[data-js="anoInput"]').get().value,
-        placa: $('[data-js="placaInput"]').get().value,
-        cor: $('[data-js="corInput"]').get().value
-      };
-    };
-
-    var addCarToRecords = function addCarToRecords (obj) {
-      var docFragment = document.createDocumentFragment();
-      var newRow = document.createElement('tr');
-
-      for(let prop in obj) {
-        var newColumn = document.createElement('td');
-        if(isPropImg(prop)) {
-          let $tdImg = document.createElement('img');
-          $tdImg.setAttribute('src', obj[prop]);
-          newColumn.appendChild($tdImg);
-        } else {
-          newColumn.textContent = obj[prop];
-        }
-        newRow.appendChild(newColumn);
-      }
-
-      docFragment.appendChild(newRow);
-      $('[data-js="recordsTable"]').get().children[1].appendChild(docFragment);
-    };
-
-    var isPropImg = function isPropImg (string) {
-      return string === 'img';
+    var addCar = function (data) {
+      UI.addCarToTable(data);
     };
 
     var publicAPI = {
       init: init,
-      initEvents: initEvents,
       getCompanyInfo: getCompanyInfo,
-      fillCompanyInfo: fillCompanyInfo,
-      handleSubmit: handleSubmit,
-      ajaxHandle: ajaxHandle,
-      isRequestSuccessful: isRequestSuccessful,
-      getFormData: getFormData,
-      addCarToRecords: addCarToRecords
+      addCar: addCar
     };
 
     return publicAPI;
-  })();
+  };
 
-  app.init();
+  // Initialize UI
+  var UI = setupUI();
+  UI.init();
+
+  // Initialize App
+  var App = setupApp(UI);
+  App.init();
 })(document, window.DOM);

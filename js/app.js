@@ -7,7 +7,7 @@
     },
 
     isPropImg: function isPropImg (string) {
-      return string === 'img';
+      return string === 'image';
     },
 
     validateFormEntries: function (obj) {
@@ -117,10 +117,28 @@
       this.parentNode.parentNode.removeChild(this.parentNode);
     };
 
+    var populateTable = function (arr) {
+      clearRecordsTable();
+
+      arr.forEach(function(car){
+        addCarToTable(car);
+      });
+    };
+
+    var clearRecordsTable = function () {
+      {
+        let $tableBody = $tableRecords.get().children[1];
+        while($tableBody.firstChild) {
+          $tableBody.removeChild($tableBody.firstChild);
+        }
+      }
+    };
+
     var publicAPI = {
       init: init,
       addCarToTable: addCarToTable,
-      fillCompanyInfo: fillCompanyInfo
+      fillCompanyInfo: fillCompanyInfo,
+      populateTable: populateTable
     };
 
     return publicAPI;
@@ -129,13 +147,14 @@
   var setupApp = function (UI) {
     var init = function () {
       getCompanyInfo();
+      getCars();
     };
 
     var getCompanyInfo = function () {
       var ajax = new XMLHttpRequest();
       ajax.open('GET', 'js/company.json');
       ajax.send();
-      ajax.addEventListener('readystatechange', handleAjaxCompanyInfo, false);
+      ajax.addEventListener('readystatechange', handleAjaxCompanyInfo, true);
     };
 
     var handleAjaxCompanyInfo = function () {
@@ -153,13 +172,43 @@
     };
 
     var addCar = function (data) {
-      UI.addCarToTable(data);
+      var ajax = new XMLHttpRequest();
+      ajax.open('POST', 'http://localhost:3000/car');
+      ajax.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      ajax.send('image=' + data.img + '&brandModel=' + data.modelo + '&year=' + data.ano + '&plate=' + data.placa + '&color=' + data.cor);
+      ajax.addEventListener('readystatechange', handleAddCar, true);
+    };
+
+    var handleAddCar = function () {
+      if(!Helpers.isRequestSuccessful(this)) return;
+      getCars();
+    };
+
+    var getCars = function () {
+      var ajax = new XMLHttpRequest();
+      ajax.open('GET', 'http://localhost:3000/car');
+      ajax.send();
+      ajax.addEventListener('readystatechange', handleGetCars, true);
+    };
+
+    var handleGetCars = function () {
+      if(!Helpers.isRequestSuccessful(this)) return;
+
+      try {
+        {
+          let data = JSON.parse(this.response);
+          UI.populateTable(data);
+        }
+      } catch (err) {
+        throw new Error('Aconteceu um probleminha:' + err);
+      }
     };
 
     var publicAPI = {
       init: init,
       getCompanyInfo: getCompanyInfo,
-      addCar: addCar
+      addCar: addCar,
+      getCars: getCars
     };
 
     return publicAPI;

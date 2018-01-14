@@ -18,14 +18,16 @@
 }
 
 /* Components */
-.button.button-primary {
+.button.button-accent {
   background-color: #ff5e62;
   border-color: #ff5e62;
+  color: #fff;
 }
 
-.button.button-primary:hover {
+.button.button-accent:hover {
   background-color: #fc7578;
   border-color: #fc7578;
+  color: #fff;
 }
 
 .section--hero {

@@ -16,10 +16,15 @@
       }
 
       return true;
+    },
+
+    isTagEqual: function (string, stringCompare) {
+      return string.toLowerCase() === stringCompare.toLowerCase();
     }
   };
 
   var setupUI = function () {
+    const $btnRemoveTemplate = '<a href="#" class="button button-accent" data-js="btnRemove">Remover</a>';
     var $title = $('title');
     var $companyName = $('[data-js="companyName"]');
     var $companyDescription = $('[data-js="companyDescription"]');
@@ -51,8 +56,8 @@
         cor: $corInput.get().value
       };
 
-      if(!Helpers.validateFormEntries(data))
-        return;
+      // if(!Helpers.validateFormEntries(data))
+      //   return;
 
       clearForm();
       App.addCar(data);
@@ -94,8 +99,22 @@
         $newRow.appendChild($newColumn);
       }
 
+      {
+        let $btnRemoveColumn = document.createElement('td');
+        $btnRemoveColumn.innerHTML = $btnRemoveTemplate;
+        $btnRemoveColumn.addEventListener('click', handleRemoveCarFromTable, false);
+        $newRow.appendChild($btnRemoveColumn);
+      }
+
       $docFragment.appendChild($newRow);
       $tableRecords.get().children[1].appendChild($docFragment);
+    };
+
+    var handleRemoveCarFromTable = function (e) {
+      e.preventDefault();
+
+      if(!Helpers.isTagEqual(e.target.tagName, 'a')) return;
+      this.parentNode.parentNode.removeChild(this.parentNode);
     };
 
     var publicAPI = {

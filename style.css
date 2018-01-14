@@ -1,0 +1,95 @@
+/* Generic */
+*,
+*::after,
+*::before {
+  padding: 0;
+  margin: 0;
+}
+
+/* Base */
+
+/* Objects */
+.section {
+  padding: 8rem 0;
+}
+
+.button {
+  border-radius: 25px;
+}
+
+/* Components */
+.button.button-accent {
+  background-color: #ff5e62;
+  border-color: #ff5e62;
+  color: #fff;
+}
+
+.button.button-accent:hover {
+  background-color: #fc7578;
+  border-color: #fc7578;
+  color: #fff;
+}
+
+.section--hero {
+  padding: 24rem 0 32rem;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.section--hero:after {
+  position: absolute;
+  top: -40%;
+  right: -10%;
+  height: 72rem;
+  width: 72rem;
+  background: #ff9966;
+  background: -webkit-linear-gradient(to right, #ff5e62, #ff9966);
+  content: '';
+  border-radius: 50px;
+  transform: rotate(20deg);
+  z-index: -1;
+}
+
+.section--hero__right {
+  position: relative;
+}
+
+.iphone {
+  position: relative;
+  position: absolute;
+  right: 0;
+  top: -16rem;
+}
+
+.iphone__img {
+  margin-left: 17px;
+  margin-top: 14px;
+  height: 546px;
+}
+
+.iphone:after {
+  width: 288px;
+  height: 577.6px;
+  background-size: 288px 577.6px;
+  background-repeat: no-repeat;
+  background-image: url("https://images.apple.com/v/iphone-x/e/images/overview/primary/hardware_portrait_silver_large.png");
+  content: '';
+  z-index: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.register-wrap {
+  margin-top: 12px;
+}
+
+.records-table img {
+  width: 100px;
+  height: 100px;
+}
+
+/* Trumps */
+.text-center {
+  text-align: center;
+}

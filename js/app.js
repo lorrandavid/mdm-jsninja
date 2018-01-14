@@ -1,6 +1,7 @@
 (function(document, $) {
   'use strict';
 
+  /*********************************************/
   var Helpers = {
     isRequestSuccessful:  function isRequestSuccessful (request) {
       return request.readyState === 4 && request.status === 200;
@@ -23,6 +24,7 @@
     }
   };
 
+  /*********************************************/
   var setupUI = function () {
     const $btnRemoveTemplate = '<a href="#" class="button button-accent" data-js="btnRemove">Remover</a>';
     var $title = $('title');
@@ -101,6 +103,7 @@
 
       {
         let $btnRemoveColumn = document.createElement('td');
+        $btnRemoveColumn.setAttribute('data-js', data.plate);
         $btnRemoveColumn.innerHTML = $btnRemoveTemplate;
         $btnRemoveColumn.addEventListener('click', handleRemoveCarFromTable, false);
         $newRow.appendChild($btnRemoveColumn);
@@ -114,7 +117,7 @@
       e.preventDefault();
 
       if(!Helpers.isTagEqual(e.target.tagName, 'a')) return;
-      this.parentNode.parentNode.removeChild(this.parentNode);
+      App.removeCar(this.getAttribute('data-js'));
     };
 
     var populateTable = function (arr) {
@@ -144,6 +147,7 @@
     return publicAPI;
   };
 
+  /*********************************************/
   var setupApp = function (UI) {
     var init = function () {
       getCompanyInfo();
@@ -204,11 +208,25 @@
       }
     };
 
+    var removeCar = function (plate) {
+      var ajax = new XMLHttpRequest();
+      ajax.open('DELETE', 'http://localhost:3000/car');
+      ajax.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      ajax.send('plate=' + plate);
+      ajax.addEventListener('readystatechange', handleRemoveCar, true);
+    };
+
+    var handleRemoveCar = function (e) {
+      if(!Helpers.isRequestSuccessful(this)) return;
+      getCars();
+    };
+
     var publicAPI = {
       init: init,
       getCompanyInfo: getCompanyInfo,
       addCar: addCar,
-      getCars: getCars
+      getCars: getCars,
+      removeCar: removeCar
     };
 
     return publicAPI;

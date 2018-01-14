@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Loja de Carros</title>
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="section section--hero">
+    <div class="container">
+      <div class="row">
+        <div class="one-half column">
+          <h3><span data-js="companyName"></span></h3>
+          <h5><span data-js="companyDescription"></span></h5>
+          <a href="#app" class="button button-accent">Comece aqui</a>
+        </div>
+
+        <div class="one-half column section--hero__right">
+          <div class="iphone">
+              <img src="https://images.apple.com/v/iphone-x/e/images/overview/primary/a11_cpu_large.jpg" alt="iPhone" class="iphone__img">
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section section--app" id="app">
+    <div class="container">
+      <div class="row">
+        <div class="four columns">
+            <div class="register-wrap">
+              <form action="." class="register-form" data-js="formRegisterCar">
+                <div>
+                  <label for="">Imagem do carro</label>
+                  <input type="text" data-js="imgInput" class="u-full-width">
+                </div>
+
+                <div>
+                  <label for="">Marca/Modelo</label>
+                  <input type="text" data-js="modeloInput" class="u-full-width">
+                </div>
+
+                <div>
+                  <label for="">Ano</label>
+                  <input type="text" data-js="anoInput" class="u-full-width">
+                </div>
+
+                <div>
+                  <label for="">Placa</label>
+                  <input type="text" data-js="placaInput" class="u-full-width">
+                </div>
+
+                <div>
+                  <label for="">Cor</label>
+                  <input type="text" data-js="corInput" class="u-full-width">
+                </div>
+
+                <div class="u-full-width u-cf">
+                    <button type="submit" class="button button-primary u-pull-right">Cadastrar</button>
+                </div>
+              </form>
+            </div>
+        </div>
+
+        <div class="eight columns">
+          <div class="records-wrap">
+            <table class="records-table u-full-width" data-js="recordsTable">
+              <thead>
+                <th>Imagem do carro</th>
+                <th>Marca/Modelo</th>
+                <th>Ano</th>
+                <th>Placa</th>
+                <th>Cor</th>
+                <th></th>
+              </thead>
+
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section section--footer">
+    <div class="container">
+      <p class="text-center">2007 &copy; <span data-js="companyName"></span> - <span data-js="companyPhone"></span></p>
+    </div>
+  </div>
+
+  <script src="js/dom.js" charset="utf-8"></script>
+  <script src="js/app.js" charset="utf-8"></script>
+</body>
+</html>

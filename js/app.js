@@ -56,8 +56,8 @@
         cor: $corInput.get().value
       };
 
-      // if(!Helpers.validateFormEntries(data))
-      //   return;
+      if(!Helpers.validateFormEntries(data))
+        return;
 
       clearForm();
       App.addCar(data);

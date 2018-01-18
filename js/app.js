@@ -220,10 +220,10 @@
   };
 
   // Initialize UI
-  var UI = setupUI();
+  const UI = setupUI();
   UI.init();
 
   // Initialize App
-  var App = setupApp(UI);
+  const App = setupApp(UI);
   App.init();
 }(document, window.DOM));

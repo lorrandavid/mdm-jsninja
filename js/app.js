@@ -12,8 +12,7 @@
     },
 
     validateFormEntries: function checkIfHasEmptyValue(obj) {
-      const values = Object.keys(obj).map(key => obj[key]);
-      return values.includes('');
+      return Object.keys(obj).map(key => obj[key]).includes('');
     },
 
     isTagEqual: function checkIfStringsAreEqual(string, stringCompare) {

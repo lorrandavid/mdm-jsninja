@@ -12,7 +12,7 @@
     },
 
     validateFormEntries: function checkIfHasEmptyValue(obj) {
-      return Object.keys(obj).map(key => obj[key]).includes('');
+      return !Object.keys(obj).map(key => obj[key]).includes('');
     },
 
     isTagEqual: function checkIfStringsAreEqual(string, stringCompare) {
@@ -54,9 +54,7 @@
         cor: $corInput.get().value,
       };
 
-      if (!Helpers.validateFormEntries(data)) {
-        return;
-      }
+      if (!Helpers.validateFormEntries(data)) return false;
 
       clearForm();
       App.addCar(data);

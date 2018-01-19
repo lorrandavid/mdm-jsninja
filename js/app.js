@@ -83,33 +83,32 @@
       e.preventDefault();
 
       if (!Helpers.isTagEqual(e.target.tagName, 'a')) return;
-      App.removeCar(this.getAttribute('data-js'));
+      App.removeCar(this.lastElementChild.getAttribute('data-js'));
+    };
+
+    const renderCarColumns = function renderCarColumns(data) {
+      return `
+        <td>
+          <img src="${data.image}" alt="${data.brandModel}">
+        </td>
+        <td>${data.brandModel}</td>
+        <td>${data.year}</td>
+        <td>${data.plate}</td>
+        <td>${data.color}</td>
+        <td data-js="${data.plate}">
+          ${$btnRemoveTemplate}
+        </td>
+      `;
     };
 
     const addCarToTable = function addCarToTable(data) {
       const $docFragment = document.createDocumentFragment();
       const $newRow = document.createElement('tr');
-      const $btnRemoveColumn = document.createElement('td');
-
-      const keys = Object.keys(data);
-      keys.forEach((prop) => {
-        const $newColumn = document.createElement('td');
-        if (Helpers.isPropImg(prop)) {
-          const $tdImg = document.createElement('img');
-          $tdImg.setAttribute('src', data[prop]);
-          $newColumn.appendChild($tdImg);
-        } else {
-          $newColumn.textContent = data[prop];
-        }
-        $newRow.appendChild($newColumn);
-      });
-
-      $btnRemoveColumn.setAttribute('data-js', data.plate);
-      $btnRemoveColumn.innerHTML = $btnRemoveTemplate;
-      $btnRemoveColumn.addEventListener('click', handleRemoveCarFromTable, false);
-      $newRow.appendChild($btnRemoveColumn);
+      $newRow.innerHTML = renderCarColumns(data);
       $docFragment.appendChild($newRow);
       $tableRecords.get().children[1].appendChild($docFragment);
+
+      $newRow.addEventListener('click', handleRemoveCarFromTable, false);
     };
 
     const clearRecordsTable = function clearRecordsTable() {
@@ -146,7 +145,7 @@
         const data = JSON.parse(this.response);
         UI.fillCompanyInfo(data);
       } catch (err) {
-        throw new Error('Aconteceu um probleminha:' + err);
+        throw new Error(`Aconteceu um probleminha: ${err}`);
       }
     };
 
@@ -164,7 +163,7 @@
         const data = JSON.parse(this.response);
         UI.populateTable(data);
       } catch (err) {
-        throw new Error('Aconteceu um probleminha:' + err);
+        throw new Error(`Aconteceu um probleminha: ${err}`);
       }
     };
 
@@ -194,7 +193,7 @@
       const ajax = new XMLHttpRequest();
       ajax.open('POST', 'http://localhost:3000/car');
       ajax.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-      ajax.send('image=' + data.img + '&brandModel=' + data.modelo + '&year=' + data.ano + '&plate=' + data.placa + '&color=' + data.cor);
+      ajax.send(`image=${data.img}&brandModel=${data.modelo}&year=${data.ano}&plate=${data.placa}&color=${data.cor}`);
       ajax.addEventListener('readystatechange', handleAddCar, true);
     };
 
@@ -202,7 +201,7 @@
       const ajax = new XMLHttpRequest();
       ajax.open('DELETE', 'http://localhost:3000/car');
       ajax.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-      ajax.send('plate=' + plate);
+      ajax.send(`plate=${plate}`);
       ajax.addEventListener('readystatechange', handleRemoveCar, true);
     };
 

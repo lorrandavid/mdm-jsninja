@@ -12,7 +12,7 @@
     },
 
     validateFormEntries: function checkIfHasEmptyValue(obj) {
-      return !Object.keys(obj).map(key => obj[key]).includes('');
+      return !Object.keys(obj).some(key => obj[key] === '');
     },
 
     isTagEqual: function checkIfStringsAreEqual(string, stringCompare) {
@@ -87,15 +87,17 @@
     };
 
     const renderCarColumns = function renderCarColumns(data) {
+      const { image, brandModel, year, plate, color } = data;
+
       return `
         <td>
-          <img src="${data.image}" alt="${data.brandModel}">
+          <img src="${image}" alt="${brandModel}">
         </td>
-        <td>${data.brandModel}</td>
-        <td>${data.year}</td>
-        <td>${data.plate}</td>
-        <td>${data.color}</td>
-        <td data-js="${data.plate}">
+        <td>${brandModel}</td>
+        <td>${year}</td>
+        <td>${plate}</td>
+        <td>${color}</td>
+        <td data-js="${plate}">
           ${$btnRemoveTemplate}
         </td>
       `;

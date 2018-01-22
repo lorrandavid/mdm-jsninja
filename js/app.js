@@ -3,19 +3,19 @@
 
   /** ****************************************** */
   const Helpers = {
-    isRequestSuccessful: function checkIfRequestIsSuccessful(request) {
+    isRequestSuccessful(request) {
       return request.readyState === 4 && request.status === 200;
     },
 
-    isPropImg: function checkIfStringEqualsImage(string) {
+    isPropImg(string) {
       return string === 'image';
     },
 
-    validateFormEntries: function checkIfHasEmptyValue(obj) {
+    validateFormEntries(obj) {
       return !Object.keys(obj).some(key => obj[key] === '');
     },
 
-    isTagEqual: function checkIfStringsAreEqual(string, stringCompare) {
+    isTagEqual(string, stringCompare) {
       return string.toLowerCase() === stringCompare.toLowerCase();
     },
   };
@@ -129,10 +129,10 @@
     };
 
     const publicAPI = {
-      init: init,
-      addCarToTable: addCarToTable,
-      fillCompanyInfo: fillCompanyInfo,
-      populateTable: populateTable
+      init,
+      addCarToTable,
+      fillCompanyInfo,
+      populateTable
     };
 
     return publicAPI;
@@ -140,45 +140,28 @@
 
   /** ****************************************** */
   const setupApp = function AppFactory(UI) {
-    const handleAjaxCompanyInfo = function handleAjaxCompanyInfo() {
-      if (!Helpers.isRequestSuccessful(this)) return;
-
-      try {
-        const data = JSON.parse(this.response);
-        UI.fillCompanyInfo(data);
-      } catch (err) {
-        throw new Error(`Aconteceu um probleminha: ${err}`);
-      }
-    };
-
     const getCompanyInfo = function getCompanyInfo() {
-      const ajax = new XMLHttpRequest();
-      ajax.open('GET', 'js/company.json');
-      ajax.send();
-      ajax.addEventListener('readystatechange', handleAjaxCompanyInfo, true);
-    };
-
-    const handleGetCars = function handleGetCars() {
-      if (!Helpers.isRequestSuccessful(this)) return;
-
-      try {
-        const data = JSON.parse(this.response);
-        UI.populateTable(data);
-      } catch (err) {
-        throw new Error(`Aconteceu um probleminha: ${err}`);
-      }
+      fetch('js/company.json')
+        .then(res => res.json()
+          .then((data) => {
+            UI.fillCompanyInfo(data);
+          })
+        )
+        .catch((err) => {
+          throw new Error(`Aconteceu um probleminha: ${err}`);
+        });
     };
 
     const getCars = function getCars() {
-      const ajax = new XMLHttpRequest();
-      ajax.open('GET', 'http://localhost:3000/car');
-      ajax.send();
-      ajax.addEventListener('readystatechange', handleGetCars, true);
-    };
-
-    const handleAddCar = function handleAddCar() {
-      if (!Helpers.isRequestSuccessful(this)) return;
-      getCars();
+      fetch('http://localhost:3000/car')
+        .then(res => res.json()
+          .then((data) => {
+            UI.populateTable(data);
+          })
+        )
+        .catch(err => {
+          throw new Error(`Aconteceu um probleminha: ${err}`);
+        });
     };
 
     const init = function initApp() {
@@ -186,33 +169,48 @@
       getCars();
     };
 
-    const handleRemoveCar = function handleRemoveCar(e) {
-      if (!Helpers.isRequestSuccessful(this)) return;
-      getCars();
-    };
-
     const addCar = function addCar(data) {
-      const ajax = new XMLHttpRequest();
-      ajax.open('POST', 'http://localhost:3000/car');
-      ajax.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-      ajax.send(`image=${data.img}&brandModel=${data.modelo}&year=${data.ano}&plate=${data.placa}&color=${data.cor}`);
-      ajax.addEventListener('readystatechange', handleAddCar, true);
+      fetch('http://localhost:3000/car', {
+        method: 'POST',
+        headers: new Headers({
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }),
+        body: `image=${data.img}&brandModel=${data.modelo}&year=${data.ano}&plate=${data.placa}&color=${data.cor}`
+      })
+      .then(res => res.json()
+        .then((data) => {
+          getCars();
+        })
+      )
+      .catch((err) => {
+        throw new Error(`Aconteceu um probleminha: ${err}`);
+      });
     };
 
     const removeCar = function removeCar(plate) {
-      const ajax = new XMLHttpRequest();
-      ajax.open('DELETE', 'http://localhost:3000/car');
-      ajax.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-      ajax.send(`plate=${plate}`);
-      ajax.addEventListener('readystatechange', handleRemoveCar, true);
+      fetch('http://localhost:3000/car', {
+        method: 'DELETE',
+        headers: new Headers({
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }),
+        body: `plate=${plate}`
+      })
+      .then(res => res.json()
+        .then((data) => {
+          getCars();
+        })
+      )
+      .catch((err) => {
+        throw new Error(`Aconteceu um probleminha: ${err}`);
+      });
     };
 
     const publicAPI = {
-      init: init,
-      getCompanyInfo: getCompanyInfo,
-      addCar: addCar,
-      getCars: getCars,
-      removeCar: removeCar
+      init,
+      getCompanyInfo,
+      addCar,
+      getCars,
+      removeCar
     };
 
     return publicAPI;

@@ -2,27 +2,24 @@
   'use strict';
 
   var DOM = function(selector) {
-    if(!(this instanceof DOM))
-      return new DOM(selector);
-
+    if(!(this instanceof DOM)) return new DOM(selector);
     this.element = document.querySelectorAll(selector);
   };
 
   DOM.prototype.on = function on(event, callback) {
-    Array.prototype.forEach.call(this.element, function($el) {
+    Array.from(this.element).forEach(function($el) {
       $el.addEventListener(event, callback, false);
     });
   };
 
   DOM.prototype.off = function off(event, callback) {
-    Array.prototype.forEach.call(this.element, function($el) {
+    Array.from(this.element).forEach(function($el) {
       $el.removeEventListener(event, callback, false);
     });
   };
 
   DOM.prototype.get = function get(index) {
-    if(!index)
-      return this.element[0];
+    if(!index) return this.element[0];
     return this.element[index];
   };
 

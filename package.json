@@ -1,7 +1,29 @@
 {
   "dependencies": {
+    "babel-polyfill": "^6.26.0",
     "eslint": "^4.15.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0"
+  },
+  "name": "fcc-jsninja",
+  "description": "Trabalho final do Curso de JavaScript Ninja",
+  "version": "1.0.0",
+  "main": ".eslintrc.js",
+  "scripts": {
+    "babel": "babel js/app.js --watch --out-file js/bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lorrandavid/fcc-jsninja.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lorrandavid/fcc-jsninja/issues"
+  },
+  "homepage": "https://github.com/lorrandavid/fcc-jsninja#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1"
   }
 }

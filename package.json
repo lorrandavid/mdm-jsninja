@@ -10,7 +10,8 @@
   "version": "1.0.0",
   "main": ".eslintrc.js",
   "scripts": {
-    "babel": "babel js/app.js --watch --out-file js/bundle.js"
+    "babel": "babel js/app.js --watch --out-file js/bundle.js",
+    "browserfy": "browserify js/app.js -t babelify --outfile js/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,8 @@
   "homepage": "https://github.com/lorrandavid/fcc-jsninja#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1"
+    "babel-preset-env": "^1.6.1",
+    "babelify": "^8.0.0",
+    "browserify": "^15.2.0"
   }
 }

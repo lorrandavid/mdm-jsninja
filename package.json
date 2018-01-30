@@ -5,7 +5,7 @@
   "main": ".eslintrc.js",
   "scripts": {
     "babel": "babel js/app.js --watch --out-file js/bundle.js",
-    "watchify": "watchify js/app.js  -o js/bundle.js -t -v [ babelify --presets [env] ]"
+    "watchify": "watchify js/modules/index.js  -o js/bundle.js -t -v [ babelify --presets [env] ]"
   },
   "repository": {
     "type": "git",
@@ -31,8 +31,11 @@
   "browserify": {
     "transform": [
       [
-        "babelify", {
-          "presets": ["env"]
+        "babelify",
+        {
+          "presets": [
+            "env"
+          ]
         }
       ]
     ]

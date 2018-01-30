@@ -1,25 +1,4 @@
 (function IIFE(document, $) {
-  'use strict';
-
-  /** ****************************************** */
-  const Helpers = {
-    isRequestSuccessful(request) {
-      return request.readyState === 4 && request.status === 200;
-    },
-
-    isPropImg(string) {
-      return string === 'image';
-    },
-
-    validateFormEntries(obj) {
-      return !Object.keys(obj).some(key => obj[key] === '');
-    },
-
-    isTagEqual(string, stringCompare) {
-      return string.toLowerCase() === stringCompare.toLowerCase();
-    },
-  };
-
   /** ****************************************** */
   const setupUI = function UIFactory() {
     const $btnRemoveTemplate = '<a href="#" class="button button-accent" data-js="btnRemove">Remover</a>';

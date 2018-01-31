@@ -5,12 +5,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = setupApp;
+// Precisar receber um parâmetro UI
 function setupApp() {
   var getCompanyInfo = function getCompanyInfo() {
     return fetch('js/company.json').then(function (res) {
-      return res.json().then(function (data) {
-        return data;
-      });
+      return res.json();
     }).catch(function (err) {
       throw new Error('Aconteceu um probleminha: ' + err);
     });
@@ -24,11 +23,6 @@ function setupApp() {
     }).catch(function (err) {
       throw new Error('Aconteceu um probleminha: ' + err);
     });
-  };
-
-  var init = function initApp() {
-    getCompanyInfo();
-    getCars();
   };
 
   var addCar = function addCar(data) {
@@ -61,6 +55,10 @@ function setupApp() {
     }).catch(function (err) {
       throw new Error('Aconteceu um probleminha: ' + err);
     });
+  };
+
+  var init = function initApp() {
+    getCars();
   };
 
   var publicAPI = {
@@ -97,46 +95,21 @@ exports.default = {
 },{}],3:[function(require,module,exports){
 'use strict';
 
-var _ui = require('./ui');
-
-var _ui2 = _interopRequireDefault(_ui);
-
 var _app = require('./app');
 
 var _app2 = _interopRequireDefault(_app);
 
+var _ui = require('./ui');
+
+var _ui2 = _interopRequireDefault(_ui);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var UI = (0, _ui2.default)();
 var App = (0, _app2.default)();
+var UI = (0, _ui2.default)(App);
 
-var index = function index() {
-  var fillCompanyInfo = function fillCompanyInfo() {
-    App.getCompanyInfo().then(function (data) {
-      UI.setCompanyInfo(data);
-    });
-  };
-
-  var initEvents = function initEvents() {};
-
-  var init = function init() {
-    initEvents();
-    fillCompanyInfo();
-  };
-
-  var publicAPI = {
-    init: init
-  };
-
-  return publicAPI;
-};
-
-// Initialize App
 App.init();
-
-// Initialize Index
-var Index = index();
-Index.init();
+UI.init();
 
 },{"./app":1,"./ui":4}],4:[function(require,module,exports){
 'use strict';
@@ -152,7 +125,8 @@ var _helpers2 = _interopRequireDefault(_helpers);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function UIFactory() {
+// Missing remove car method
+function UIFactory(App) {
   var $ = window.DOM;
   var $btnRemoveTemplate = '<a href="#" class="button button-accent" data-js="btnRemove">Remover</a>';
   var $title = $('title');
@@ -175,15 +149,44 @@ function UIFactory() {
     $corInput.get().value = '';
   };
 
-  var setCompanyInfo = function displayCompanyInfoIntoView(data) {
-    $title.get().textContent = data.title;
-    $companyDescription.get().textContent = data.description;
-    $companyPhone.get().textContent = data.phone;
+  var handleSubmitForm = function handleSubmitForm(e) {
+    e.preventDefault();
 
-    $companyName.forEach(function (item) {
-      var $nameEl = item;
-      $nameEl.textContent = data.name;
+    var data = {
+      img: $imgInput.get().value,
+      modelo: $modeloInput.get().value,
+      ano: $anoInput.get().value,
+      placa: $placaInput.get().value,
+      cor: $corInput.get().value
+    };
+
+    if (!_helpers2.default.validateFormEntries(data)) return;
+    clearForm();
+    App.addCar(data);
+  };
+
+  var initEvents = function initEvents() {
+    $formRegisterCar.on('click', handleSubmitForm, false);
+  };
+
+  var setCompanyInfo = function displayCompanyInfoIntoView() {
+    App.getCompanyInfo().then(function (data) {
+      $title.get().textContent = data.title;
+      $companyDescription.get().textContent = data.description;
+      $companyPhone.get().textContent = data.phone;
+
+      $companyName.forEach(function (item) {
+        var $nameEl = item;
+        $nameEl.textContent = data.name;
+      });
+    }).catch(function (err) {
+      console.log('Aconteceu um probleminha:', err);
     });
+  };
+
+  var init = function init() {
+    initEvents();
+    setCompanyInfo();
   };
 
   var renderCarColumns = function renderCarColumns(data) {
@@ -205,7 +208,11 @@ function UIFactory() {
   };
 
   var publicAPI = {
-    setCompanyInfo: setCompanyInfo
+    init: init,
+    setCompanyInfo: setCompanyInfo,
+    renderCarColumns: renderCarColumns,
+    clearRecordsTable: clearRecordsTable,
+    clearForm: clearForm
   };
 
   return publicAPI;

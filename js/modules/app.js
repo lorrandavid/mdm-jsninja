@@ -1,8 +1,8 @@
+// Precisar receber um parâmetro UI
 export default function setupApp() {
   const getCompanyInfo = function getCompanyInfo() {
     return fetch('js/company.json')
-      .then(res => res.json()
-        .then(data => data))
+      .then(res => res.json())
       .catch((err) => {
         throw new Error(`Aconteceu um probleminha: ${err}`);
       });
@@ -15,11 +15,6 @@ export default function setupApp() {
       .catch((err) => {
         throw new Error(`Aconteceu um probleminha: ${err}`);
       });
-  };
-
-  const init = function initApp() {
-    getCompanyInfo();
-    getCars();
   };
 
   const addCar = function addCar(data) {
@@ -54,6 +49,10 @@ export default function setupApp() {
       .catch((err) => {
         throw new Error(`Aconteceu um probleminha: ${err}`);
       });
+  };
+
+  const init = function initApp() {
+    getCars();
   };
 
   const publicAPI = {

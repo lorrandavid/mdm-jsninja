@@ -1,6 +1,7 @@
 import Helpers from './helpers';
 
-export default function UIFactory() {
+// Missing remove car method
+export default function UIFactory(App) {
   const $ = window.DOM;
   const $btnRemoveTemplate = '<a href="#" class="button button-accent" data-js="btnRemove">Remover</a>';
   const $title = $('title');
@@ -23,15 +24,46 @@ export default function UIFactory() {
     $corInput.get().value = '';
   };
 
-  const setCompanyInfo = function displayCompanyInfoIntoView(data) {
-    $title.get().textContent = data.title;
-    $companyDescription.get().textContent = data.description;
-    $companyPhone.get().textContent = data.phone;
+  const handleSubmitForm = function handleSubmitForm(e) {
+    e.preventDefault();
 
-    $companyName.forEach((item) => {
-      const $nameEl = item;
-      $nameEl.textContent = data.name;
-    });
+    const data = {
+      img: $imgInput.get().value,
+      modelo: $modeloInput.get().value,
+      ano: $anoInput.get().value,
+      placa: $placaInput.get().value,
+      cor: $corInput.get().value,
+    };
+
+    if (!Helpers.validateFormEntries(data)) return;
+    clearForm();
+    App.addCar(data);
+  };
+
+  const initEvents = function initEvents() {
+    $formRegisterCar.on('click', handleSubmitForm, false);
+  };
+
+  const setCompanyInfo = function displayCompanyInfoIntoView() {
+    App.getCompanyInfo()
+      .then((data) => {
+        $title.get().textContent = data.title;
+        $companyDescription.get().textContent = data.description;
+        $companyPhone.get().textContent = data.phone;
+
+        $companyName.forEach((item) => {
+          const $nameEl = item;
+          $nameEl.textContent = data.name;
+        });
+      })
+      .catch((err) => {
+        console.log('Aconteceu um probleminha:', err);
+      });
+  };
+
+  const init = function init() {
+    initEvents();
+    setCompanyInfo();
   };
 
   const renderCarColumns = function renderCarColumns(data) {
@@ -61,7 +93,11 @@ export default function UIFactory() {
   };
 
   const publicAPI = {
+    init,
     setCompanyInfo,
+    renderCarColumns,
+    clearRecordsTable,
+    clearForm,
   };
 
   return publicAPI;

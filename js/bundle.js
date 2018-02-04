@@ -16,7 +16,7 @@ function setupApp() {
   };
 
   var getCars = function getCars() {
-    fetch('http://localhost:3000/car').then(function (res) {
+    return fetch('http://localhost:3000/car').then(function (res) {
       return res.json().then(function (data) {
         return data;
       });
@@ -42,18 +42,12 @@ function setupApp() {
   };
 
   var removeCar = function removeCar(plate) {
-    fetch('http://localhost:3000/car', {
+    return fetch('http://localhost:3000/car', {
       method: 'DELETE',
       headers: new Headers({
         'Content-Type': 'application/x-www-form-urlencoded'
       }),
       body: 'plate=' + plate
-    }).then(function (res) {
-      return res.json().then(function () {
-        getCars();
-      });
-    }).catch(function (err) {
-      throw new Error('Aconteceu um probleminha: ' + err);
     });
   };
 
@@ -163,10 +157,11 @@ function UIFactory(App) {
     if (!_helpers2.default.validateFormEntries(data)) return;
     clearForm();
     App.addCar(data);
+    getCars();
   };
 
   var initEvents = function initEvents() {
-    $formRegisterCar.on('click', handleSubmitForm, false);
+    $formRegisterCar.on('submit', handleSubmitForm, false);
   };
 
   var setCompanyInfo = function displayCompanyInfoIntoView() {
@@ -187,6 +182,63 @@ function UIFactory(App) {
   var init = function init() {
     initEvents();
     setCompanyInfo();
+    getCars();
+  };
+
+  var addCarToTable = function addCarToTable(data) {
+    var $docFragment = document.createDocumentFragment();
+    var $newRow = document.createElement('tr');
+    $newRow.innerHTML = renderCarColumns(data);
+    $docFragment.appendChild($newRow);
+    $tableRecords.get().children[1].appendChild($docFragment);
+    $newRow.addEventListener('click', handleRemoveCarFromTable, false);
+  };
+
+  var populateTable = function populateTable(arr) {
+    clearRecordsTable();
+
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = arr[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var car = _step.value;
+
+        addCarToTable(car);
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+  };
+
+  var getCars = function getCarsTable() {
+    App.getCars().then(function (cars) {
+      populateTable(cars);
+    }).catch(function (err) {
+      console.log('Aconteceu um probleminha:', err);
+    });
+  };
+
+  var handleRemoveCarFromTable = function handleRemoveCarFromTable(e) {
+    e.preventDefault();
+    if (!_helpers2.default.isTagEqual(e.target.tagName, 'a')) return;
+    App.removeCar(this.lastElementChild.getAttribute('data-js')).then(function () {
+      getCars();
+    }).catch(function (err) {
+      console.log('Aconteceu um probleminha:', err);
+    });
   };
 
   var renderCarColumns = function renderCarColumns(data) {
@@ -210,6 +262,7 @@ function UIFactory(App) {
   var publicAPI = {
     init: init,
     setCompanyInfo: setCompanyInfo,
+    getCars: getCars,
     renderCarColumns: renderCarColumns,
     clearRecordsTable: clearRecordsTable,
     clearForm: clearForm

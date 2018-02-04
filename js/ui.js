@@ -38,10 +38,11 @@ export default function UIFactory(App) {
     if (!Helpers.validateFormEntries(data)) return;
     clearForm();
     App.addCar(data);
+    getCars();
   };
 
   const initEvents = function initEvents() {
-    $formRegisterCar.on('click', handleSubmitForm, false);
+    $formRegisterCar.on('submit', handleSubmitForm, false);
   };
 
   const setCompanyInfo = function displayCompanyInfoIntoView() {
@@ -64,6 +65,46 @@ export default function UIFactory(App) {
   const init = function init() {
     initEvents();
     setCompanyInfo();
+    getCars();
+  };
+
+  const addCarToTable = function addCarToTable(data) {
+    const $docFragment = document.createDocumentFragment();
+    const $newRow = document.createElement('tr');
+    $newRow.innerHTML = renderCarColumns(data);
+    $docFragment.appendChild($newRow);
+    $tableRecords.get().children[1].appendChild($docFragment);
+    $newRow.addEventListener('click', handleRemoveCarFromTable, false);
+  };
+
+  const populateTable = function populateTable(arr) {
+    clearRecordsTable();
+
+    for (let car of arr) {
+      addCarToTable(car);
+    }
+  };
+
+  const getCars = function getCarsTable() {
+    App.getCars()
+      .then((cars) => {
+        populateTable(cars);
+      })
+      .catch((err) => {
+        console.log('Aconteceu um probleminha:', err);
+      });
+  };
+
+  const handleRemoveCarFromTable = function handleRemoveCarFromTable(e) {
+    e.preventDefault();
+    if (!Helpers.isTagEqual(e.target.tagName, 'a')) return;
+    App.removeCar(this.lastElementChild.getAttribute('data-js'))
+      .then(() => {
+        getCars();
+      })
+      .catch((err) => {
+        console.log('Aconteceu um probleminha:', err);
+      });
   };
 
   const renderCarColumns = function renderCarColumns(data) {
@@ -95,6 +136,7 @@ export default function UIFactory(App) {
   const publicAPI = {
     init,
     setCompanyInfo,
+    getCars,
     renderCarColumns,
     clearRecordsTable,
     clearForm,

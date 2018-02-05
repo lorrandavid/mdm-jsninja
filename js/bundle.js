@@ -11,7 +11,7 @@ function setupApp() {
     return fetch('js/company.json').then(function (res) {
       return res.json();
     }).catch(function (err) {
-      throw new Error('Aconteceu um probleminha: ' + err);
+      throw new Error(err);
     });
   };
 
@@ -21,7 +21,7 @@ function setupApp() {
         return data;
       });
     }).catch(function (err) {
-      throw new Error('Aconteceu um probleminha: ' + err);
+      throw new Error(err);
     });
   };
 
@@ -37,7 +37,7 @@ function setupApp() {
         getCars();
       });
     }).catch(function (err) {
-      throw new Error('Aconteceu um probleminha: ' + err);
+      throw new Error(err);
     });
   };
 
@@ -143,6 +143,60 @@ function UIFactory(App) {
     $corInput.get().value = '';
   };
 
+  var renderCarColumns = function renderCarColumns(data) {
+    var image = data.image,
+        brandModel = data.brandModel,
+        year = data.year,
+        plate = data.plate,
+        color = data.color;
+
+
+    return '\n      <td>\n        <img src="' + image + '" alt="' + brandModel + '">\n      </td>\n      <td>' + brandModel + '</td>\n      <td>' + year + '</td>\n      <td>' + plate + '</td>\n      <td>' + color + '</td>\n      <td data-js="' + plate + '">\n        ' + $btnRemoveTemplate + '\n      </td>\n    ';
+  };
+
+  var clearRecordsTable = function clearRecordsTable() {
+    var $tableBody = $tableRecords.get().children[1];
+    while ($tableBody.firstChild) {
+      $tableBody.removeChild($tableBody.firstChild);
+    }
+  };
+
+  var handleRemoveCarFromTable = function handleRemoveCarFromTable(e) {
+    var _this = this;
+
+    e.preventDefault();
+    if (!_helpers2.default.isTagEqual(e.target.tagName, 'a')) return;
+    App.removeCar(this.lastElementChild.getAttribute('data-js')).then(function () {
+      _this.parentNode.removeChild(_this);
+    }).catch(function (err) {
+      throw new Error(err);
+    });
+  };
+
+  var addCarToTable = function addCarToTable(data) {
+    var $docFragment = document.createDocumentFragment();
+    var $newRow = document.createElement('tr');
+    $newRow.innerHTML = renderCarColumns(data);
+    $docFragment.appendChild($newRow);
+    $tableRecords.get().children[1].appendChild($docFragment);
+    $newRow.addEventListener('click', handleRemoveCarFromTable, false);
+  };
+
+  var populateTable = function populateTable(arr) {
+    clearRecordsTable();
+    arr.forEach(function (car) {
+      addCarToTable(car);
+    });
+  };
+
+  var getCars = function getCarsTable() {
+    App.getCars().then(function (cars) {
+      populateTable(cars);
+    }).catch(function (err) {
+      throw new Error(err);
+    });
+  };
+
   var handleSubmitForm = function handleSubmitForm(e) {
     e.preventDefault();
 
@@ -175,7 +229,7 @@ function UIFactory(App) {
         $nameEl.textContent = data.name;
       });
     }).catch(function (err) {
-      console.log('Aconteceu um probleminha:', err);
+      throw new Error(err);
     });
   };
 
@@ -183,80 +237,6 @@ function UIFactory(App) {
     initEvents();
     setCompanyInfo();
     getCars();
-  };
-
-  var addCarToTable = function addCarToTable(data) {
-    var $docFragment = document.createDocumentFragment();
-    var $newRow = document.createElement('tr');
-    $newRow.innerHTML = renderCarColumns(data);
-    $docFragment.appendChild($newRow);
-    $tableRecords.get().children[1].appendChild($docFragment);
-    $newRow.addEventListener('click', handleRemoveCarFromTable, false);
-  };
-
-  var populateTable = function populateTable(arr) {
-    clearRecordsTable();
-
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
-
-    try {
-      for (var _iterator = arr[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var car = _step.value;
-
-        addCarToTable(car);
-      }
-    } catch (err) {
-      _didIteratorError = true;
-      _iteratorError = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion && _iterator.return) {
-          _iterator.return();
-        }
-      } finally {
-        if (_didIteratorError) {
-          throw _iteratorError;
-        }
-      }
-    }
-  };
-
-  var getCars = function getCarsTable() {
-    App.getCars().then(function (cars) {
-      populateTable(cars);
-    }).catch(function (err) {
-      console.log('Aconteceu um probleminha:', err);
-    });
-  };
-
-  var handleRemoveCarFromTable = function handleRemoveCarFromTable(e) {
-    e.preventDefault();
-    if (!_helpers2.default.isTagEqual(e.target.tagName, 'a')) return;
-    App.removeCar(this.lastElementChild.getAttribute('data-js')).then(function () {
-      getCars();
-    }).catch(function (err) {
-      console.log('Aconteceu um probleminha:', err);
-    });
-  };
-
-  var renderCarColumns = function renderCarColumns(data) {
-    var image = data.image,
-        brandModel = data.brandModel,
-        year = data.year,
-        plate = data.plate,
-        color = data.color;
-
-
-    return '\n      <td>\n        <img src="' + image + '" alt="' + brandModel + '">\n      </td>\n      <td>' + brandModel + '</td>\n      <td>' + year + '</td>\n      <td>' + plate + '</td>\n      <td>' + color + '</td>\n      <td data-js="' + plate + '">\n        ' + $btnRemoveTemplate + '\n      </td>\n    ';
-  };
-
-  var clearRecordsTable = function clearRecordsTable() {
-    var $tableBody = $tableRecords.get().children[1];
-    while ($tableBody.firstChild) {
-      $tableBody.removeChild($tableBody.firstChild);
-    }
   };
 
   var publicAPI = {

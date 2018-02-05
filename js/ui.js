@@ -24,6 +24,70 @@ export default function UIFactory(App) {
     $corInput.get().value = '';
   };
 
+  const renderCarColumns = function renderCarColumns(data) {
+    const {
+      image, brandModel, year, plate, color,
+    } = data;
+
+    return `
+      <td>
+        <img src="${image}" alt="${brandModel}">
+      </td>
+      <td>${brandModel}</td>
+      <td>${year}</td>
+      <td>${plate}</td>
+      <td>${color}</td>
+      <td data-js="${plate}">
+        ${$btnRemoveTemplate}
+      </td>
+    `;
+  };
+
+  const clearRecordsTable = function clearRecordsTable() {
+    const $tableBody = $tableRecords.get().children[1];
+    while ($tableBody.firstChild) {
+      $tableBody.removeChild($tableBody.firstChild);
+    }
+  };
+
+  const handleRemoveCarFromTable = function handleRemoveCarFromTable(e) {
+    e.preventDefault();
+    if (!Helpers.isTagEqual(e.target.tagName, 'a')) return;
+    App.removeCar(this.lastElementChild.getAttribute('data-js'))
+      .then(() => {
+        this.parentNode.removeChild(this);
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+  };
+
+  const addCarToTable = function addCarToTable(data) {
+    const $docFragment = document.createDocumentFragment();
+    const $newRow = document.createElement('tr');
+    $newRow.innerHTML = renderCarColumns(data);
+    $docFragment.appendChild($newRow);
+    $tableRecords.get().children[1].appendChild($docFragment);
+    $newRow.addEventListener('click', handleRemoveCarFromTable, false);
+  };
+
+  const populateTable = function populateTable(arr) {
+    clearRecordsTable();
+    arr.forEach((car) => {
+      addCarToTable(car);
+    });
+  };
+
+  const getCars = function getCarsTable() {
+    App.getCars()
+      .then((cars) => {
+        populateTable(cars);
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+  };
+
   const handleSubmitForm = function handleSubmitForm(e) {
     e.preventDefault();
 
@@ -58,79 +122,15 @@ export default function UIFactory(App) {
         });
       })
       .catch((err) => {
-        console.log('Aconteceu um probleminha:', err);
+        throw new Error(err);
       });
   };
+
 
   const init = function init() {
     initEvents();
     setCompanyInfo();
     getCars();
-  };
-
-  const addCarToTable = function addCarToTable(data) {
-    const $docFragment = document.createDocumentFragment();
-    const $newRow = document.createElement('tr');
-    $newRow.innerHTML = renderCarColumns(data);
-    $docFragment.appendChild($newRow);
-    $tableRecords.get().children[1].appendChild($docFragment);
-    $newRow.addEventListener('click', handleRemoveCarFromTable, false);
-  };
-
-  const populateTable = function populateTable(arr) {
-    clearRecordsTable();
-
-    for (let car of arr) {
-      addCarToTable(car);
-    }
-  };
-
-  const getCars = function getCarsTable() {
-    App.getCars()
-      .then((cars) => {
-        populateTable(cars);
-      })
-      .catch((err) => {
-        console.log('Aconteceu um probleminha:', err);
-      });
-  };
-
-  const handleRemoveCarFromTable = function handleRemoveCarFromTable(e) {
-    e.preventDefault();
-    if (!Helpers.isTagEqual(e.target.tagName, 'a')) return;
-    App.removeCar(this.lastElementChild.getAttribute('data-js'))
-      .then(() => {
-        getCars();
-      })
-      .catch((err) => {
-        console.log('Aconteceu um probleminha:', err);
-      });
-  };
-
-  const renderCarColumns = function renderCarColumns(data) {
-    const {
-      image, brandModel, year, plate, color,
-    } = data;
-
-    return `
-      <td>
-        <img src="${image}" alt="${brandModel}">
-      </td>
-      <td>${brandModel}</td>
-      <td>${year}</td>
-      <td>${plate}</td>
-      <td>${color}</td>
-      <td data-js="${plate}">
-        ${$btnRemoveTemplate}
-      </td>
-    `;
-  };
-
-  const clearRecordsTable = function clearRecordsTable() {
-    const $tableBody = $tableRecords.get().children[1];
-    while ($tableBody.firstChild) {
-      $tableBody.removeChild($tableBody.firstChild);
-    }
   };
 
   const publicAPI = {

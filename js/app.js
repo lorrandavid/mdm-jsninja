@@ -4,7 +4,7 @@ export default function setupApp() {
     return fetch('js/company.json')
       .then(res => res.json())
       .catch((err) => {
-        throw new Error(`Aconteceu um probleminha: ${err}`);
+        throw new Error(err);
       });
   };
 
@@ -13,7 +13,7 @@ export default function setupApp() {
       .then(res => res.json()
         .then(data => data))
       .catch((err) => {
-        throw new Error(`Aconteceu um probleminha: ${err}`);
+        throw new Error(err);
       });
   };
 
@@ -30,7 +30,7 @@ export default function setupApp() {
           getCars();
         }))
       .catch((err) => {
-        throw new Error(`Aconteceu um probleminha: ${err}`);
+        throw new Error(err);
       });
   };
 

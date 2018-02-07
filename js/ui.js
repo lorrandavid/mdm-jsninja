@@ -1,14 +1,8 @@
-import Helpers from './helpers';
-
-// Missing remove car method
-export default function UIFactory(App) {
-  const $ = window.DOM;
-  const $btnRemoveTemplate = '<a href="#" class="button button-accent" data-js="btnRemove">Remover</a>';
+export default function UIFactory($ = window.DOM) {
   const $title = $('title');
   const $companyName = $('[data-js="companyName"]');
   const $companyDescription = $('[data-js="companyDescription"]');
   const $companyPhone = $('[data-js="companyPhone"]');
-  const $formRegisterCar = $('[data-js="formRegisterCar"]');
   const $tableRecords = $('[data-js="recordsTable"]');
   const $imgInput = $('[data-js="imgInput"]');
   const $modeloInput = $('[data-js="modeloInput"]');
@@ -24,7 +18,32 @@ export default function UIFactory(App) {
     $corInput.get().value = '';
   };
 
-  const renderCarColumns = function renderCarColumns(data) {
+  const clearTable = function clearRecordsTable() {
+    const $tableBody = $tableRecords.get().children[1];
+    while ($tableBody.firstChild) {
+      $tableBody.removeChild($tableBody.firstChild);
+    }
+  };
+
+  const getFormData = function getFormData() {
+    return {
+      img: $imgInput.get().value,
+      modelo: $modeloInput.get().value,
+      ano: $anoInput.get().value,
+      placa: $placaInput.get().value,
+      cor: $corInput.get().value,
+    };
+  };
+
+  const renderRemoveBtn = function renderRemoveButton() {
+    return `
+      <a href="#" class="button button-accent" data-js="btnRemove">
+        Remover
+      </a>
+    `;
+  };
+
+  const renderCar = function renderCarColumn(data) {
     const {
       image, brandModel, year, plate, color,
     } = data;
@@ -38,108 +57,45 @@ export default function UIFactory(App) {
       <td>${plate}</td>
       <td>${color}</td>
       <td data-js="${plate}">
-        ${$btnRemoveTemplate}
+        ${renderRemoveBtn()}
       </td>
     `;
-  };
-
-  const clearRecordsTable = function clearRecordsTable() {
-    const $tableBody = $tableRecords.get().children[1];
-    while ($tableBody.firstChild) {
-      $tableBody.removeChild($tableBody.firstChild);
-    }
-  };
-
-  const handleRemoveCarFromTable = function handleRemoveCarFromTable(e) {
-    e.preventDefault();
-    if (!Helpers.isTagEqual(e.target.tagName, 'a')) return;
-    App.removeCar(this.lastElementChild.getAttribute('data-js'))
-      .then(() => {
-        this.parentNode.removeChild(this);
-      })
-      .catch((err) => {
-        throw new Error(err);
-      });
   };
 
   const addCarToTable = function addCarToTable(data) {
     const $docFragment = document.createDocumentFragment();
     const $newRow = document.createElement('tr');
-    $newRow.innerHTML = renderCarColumns(data);
+    $newRow.innerHTML = renderCar(data);
     $docFragment.appendChild($newRow);
     $tableRecords.get().children[1].appendChild($docFragment);
-    $newRow.addEventListener('click', handleRemoveCarFromTable, false);
   };
 
-  const populateTable = function populateTable(arr) {
-    clearRecordsTable();
-    arr.forEach((car) => {
+  const populateTable = function populateTable(cars) {
+    clearTable();
+    cars.forEach((car) => {
       addCarToTable(car);
     });
   };
 
-  const getCars = function getCarsTable() {
-    App.getCars()
-      .then((cars) => {
-        populateTable(cars);
-      })
-      .catch((err) => {
-        throw new Error(err);
-      });
-  };
+  const setCompanyInfo = function displayCompanyInfoIntoView(data) {
+    $title.get().textContent = data.title;
+    $companyDescription.get().textContent = data.description;
+    $companyPhone.get().textContent = data.phone;
 
-  const handleSubmitForm = function handleSubmitForm(e) {
-    e.preventDefault();
-
-    const data = {
-      img: $imgInput.get().value,
-      modelo: $modeloInput.get().value,
-      ano: $anoInput.get().value,
-      placa: $placaInput.get().value,
-      cor: $corInput.get().value,
-    };
-
-    if (!Helpers.validateFormEntries(data)) return;
-    clearForm();
-    App.addCar(data);
-    getCars();
-  };
-
-  const initEvents = function initEvents() {
-    $formRegisterCar.on('submit', handleSubmitForm, false);
-  };
-
-  const setCompanyInfo = function displayCompanyInfoIntoView() {
-    App.getCompanyInfo()
-      .then((data) => {
-        $title.get().textContent = data.title;
-        $companyDescription.get().textContent = data.description;
-        $companyPhone.get().textContent = data.phone;
-
-        $companyName.forEach((item) => {
-          const $nameEl = item;
-          $nameEl.textContent = data.name;
-        });
-      })
-      .catch((err) => {
-        throw new Error(err);
-      });
-  };
-
-
-  const init = function init() {
-    initEvents();
-    setCompanyInfo();
-    getCars();
+    $companyName.forEach((item) => {
+      const $nameEl = item;
+      $nameEl.textContent = data.name;
+    });
   };
 
   const publicAPI = {
-    init,
     setCompanyInfo,
-    getCars,
-    renderCarColumns,
-    clearRecordsTable,
+    populateTable,
+    addCarToTable,
+    renderCar,
+    clearTable,
     clearForm,
+    getFormData,
   };
 
   return publicAPI;

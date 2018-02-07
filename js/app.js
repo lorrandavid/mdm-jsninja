@@ -1,60 +1,66 @@
-// Precisar receber um parâmetro UI
-export default function setupApp() {
+import Helpers from './helpers';
+import CarFactory from './car';
+import UIFactory from './ui';
+
+const Car = CarFactory();
+const UI = UIFactory();
+
+const AppFactory = function setupApp($ = window.DOM) {
+  const formRegister = $('[data-js="formRegisterCar"]');
+
   const getCompanyInfo = function getCompanyInfo() {
-    return fetch('js/company.json')
-      .then(res => res.json())
+    fetch('./js/company.json')
+      .then(data => data.json())
+      .then((data) => {
+        UI.setCompanyInfo(data);
+      })
       .catch((err) => {
-        throw new Error(err);
+        throw new Error(`Aconteceu um probleminha: ${err}`);
       });
   };
 
   const getCars = function getCars() {
-    return fetch('http://localhost:3000/car')
-      .then(res => res.json()
-        .then(data => data))
+    Car.list()
+      .then(data => data.json())
+      .then((data) => {
+        UI.populateTable(data);
+      })
       .catch((err) => {
-        throw new Error(err);
+        throw new Error(`Aconteceu um probleminha: ${err}`);
       });
   };
 
-  const addCar = function addCar(data) {
-    fetch('http://localhost:3000/car', {
-      method: 'POST',
-      headers: new Headers({
-        'Content-Type': 'application/x-www-form-urlencoded',
-      }),
-      body: `image=${data.img}&brandModel=${data.modelo}&year=${data.ano}&plate=${data.placa}&color=${data.cor}`,
-    })
-      .then(res => res.json()
-        .then(() => {
-          getCars();
-        }))
+  const handleFormSubmit = function handleFormSubmit(e) {
+    e.preventDefault();
+
+    const data = UI.getFormData();
+    if (!Helpers.validateFormEntries(data)) return;
+    Car.add(data)
+      .then(() => {
+        UI.clearForm();
+        getCars();
+      })
       .catch((err) => {
-        throw new Error(err);
+        throw new Error(`Aconteceu um probleminha: ${err}`);
       });
   };
 
-  const removeCar = function removeCar(plate) {
-    return fetch('http://localhost:3000/car', {
-      method: 'DELETE',
-      headers: new Headers({
-        'Content-Type': 'application/x-www-form-urlencoded',
-      }),
-      body: `plate=${plate}`,
-    });
+  const initEvents = function initializeEvents() {
+    formRegister.on('submit', handleFormSubmit, false);
   };
 
-  const init = function initApp() {
+  const init = function init() {
+    getCompanyInfo();
     getCars();
+    initEvents();
   };
 
   const publicAPI = {
     init,
-    getCompanyInfo,
-    addCar,
-    getCars,
-    removeCar,
   };
 
   return publicAPI;
-}
+};
+
+const App = AppFactory();
+App.init();

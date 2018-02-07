@@ -1,4 +1,4 @@
-(function(global, document) {
+(function IIFE(global, document) {
   'use strict';
 
   var DOM = function(selector) {
@@ -88,4 +88,4 @@
   };
 
   global.DOM = DOM;
-})(window, document);
+}(window, document));

@@ -25,7 +25,7 @@ export default function setupCar() {
     });
   };
 
-  const init = function initApp() {
+  const init = function initCar() {
     list();
   };
 

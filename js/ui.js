@@ -89,6 +89,7 @@ export default function UIFactory($ = window.DOM) {
   };
 
   const publicAPI = {
+    $,
     setCompanyInfo,
     populateTable,
     addCarToTable,

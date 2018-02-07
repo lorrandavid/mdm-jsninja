@@ -1,8 +1,4 @@
 export default {
-  isPropImg(string) {
-    return string === 'image';
-  },
-
   validateFormEntries(obj) {
     return !Object.keys(obj).some(key => obj[key] === '');
   },

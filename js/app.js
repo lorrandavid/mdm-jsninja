@@ -5,8 +5,8 @@ import UIFactory from './ui';
 const Car = CarFactory();
 const UI = UIFactory();
 
-const AppFactory = function setupApp($ = window.DOM) {
-  const formRegister = $('[data-js="formRegisterCar"]');
+const AppFactory = function setupApp() {
+  const $formRegister = UI.$('[data-js="formRegisterCar"]');
 
   const getCompanyInfo = function getCompanyInfo() {
     fetch('./js/company.json')
@@ -46,7 +46,7 @@ const AppFactory = function setupApp($ = window.DOM) {
   };
 
   const initEvents = function initializeEvents() {
-    formRegister.on('submit', handleFormSubmit, false);
+    $formRegister.on('submit', handleFormSubmit, false);
   };
 
   const init = function init() {
